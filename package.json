@@ -1,0 +1,24 @@
+{
+  "name": "tls-browserify",
+  "version": "0.0.1",
+  "description": "A port of the tls module for the browser.",
+  "author": "Emersion <contact@emersion.fr>",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "node-forge": "^0.6.12"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emersion/tls-browserify.git"
+  },
+  "keywords": [
+    "browserify",
+    "tls",
+    "browser"
+  ],
+  "bugs": {
+    "url": "https://github.com/emersion/tls-browserify/issues"
+  },
+  "homepage": "https://github.com/emersion/tls-browserify"
+}
