@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/emersion/tls-browserify",
   "scripts": {
-    "postinstall": "cd node_modules/node-forge && npm install && npm run minify"
+    "postinstall": "cd node_modules/node-forge && npm install --production=false && npm run minify"
   },
   "browser": {
     "node-forge": "node-forge/js/forge.min.js"
