@@ -2,7 +2,12 @@ var net = require('net');
 var util = require('util');
 var assert = require('assert');
 var Stream = require('stream');
-var forge = require('node-forge').forge; // TODO: this is not working in Node
+var forge = require('node-forge');
+
+// Compatibility shim for the browser
+if (typeof forge.forge == 'object') {
+	forge = forge.forge;
+}
 
 function TLSSocket(socket, options) {
 	if (!(this instanceof TLSSocket)) return new TLSSocket(socket, options);
