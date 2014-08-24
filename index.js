@@ -5,7 +5,7 @@ var Stream = require('stream');
 var forge = require('node-forge');
 
 // Compatibility shim for the browser
-if (typeof forge.forge == 'object') {
+if (forge.forge) {
 	forge = forge.forge;
 }
 
