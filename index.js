@@ -96,7 +96,7 @@ TLSSocket.prototype._init = function(socket) {
 		dataReady: function(connection) {
 			// clear data from the server is ready
 			var data = connection.data.getBytes(),
-				buffer = new Buffer(data);
+				buffer = new Buffer(data, 'binary');
 
 			console.log('[tls] received: ', data);
 			self.push(buffer);
