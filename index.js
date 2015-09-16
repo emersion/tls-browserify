@@ -9,7 +9,7 @@ if (forge.forge) {
 	forge = forge.forge;
 }
 
-function TLSSocket(socket, options) {
+function TLSSocket(socket, options, debug) {
 	if (!(this instanceof TLSSocket)) return new TLSSocket(socket, options);
 
 	var self = this;
@@ -21,6 +21,7 @@ function TLSSocket(socket, options) {
 
 	this._tlsOptions = options;
 	this._secureEstablished = false;
+        this.debug = debug || false;
 
 	// Just a documented property to make secure sockets
 	// distinguishable from regular ones.
@@ -47,6 +48,12 @@ util.inherits(TLSSocket, net.Socket);
 
 exports.TLSSocket = TLSSocket;
 
+TLSSocket.prototype.log = function(arguments) {
+    if (this.debug) {
+        console.log.apply(console, Array.prototype.slice.call(arguments));
+    }
+}
+
 TLSSocket.prototype._init = function(socket) {
 	var self = this;
 	var options = this._tlsOptions;
@@ -55,11 +62,11 @@ TLSSocket.prototype._init = function(socket) {
 		server: false,
 		verify: function(connection, verified, depth, certs) {
 			if (!options.rejectUnauthorized || !options.servername) {
-				console.log('[tls] server certificate verification skipped');
+				self.log('[tls] server certificate verification skipped');
 				return true;
 			}
 
-			console.log('[tls] skipping certificate trust verification');
+			self.log('[tls] skipping certificate trust verification');
 			verified = true;
 
 			if (depth === 0) {
@@ -71,13 +78,13 @@ TLSSocket.prototype._init = function(socket) {
 					};
 					console.warn('[tls] '+cn+' !== '+options.servername);
 				}
-				console.log('[tls] server certificate verified');
+				self.log('[tls] server certificate verified');
 			}
 
 			return verified;
 		},
 		connected: function(connection) {
-			console.log('[tls] connected', self);
+			self.log('[tls] connected', self);
 			// prepare some data to send (note that the string is interpreted as
 			// 'binary' encoded, which works for HTTP which only uses ASCII, use
 			// forge.util.encodeUtf8(str) otherwise
@@ -89,7 +96,7 @@ TLSSocket.prototype._init = function(socket) {
 		tlsDataReady: function(connection) {
 			// encrypted data is ready to be sent to the server
 			var data = connection.tlsData.getBytes();
-			//console.log('[tls] sending encrypted: ', data, data.length);
+			//self.log('[tls] sending encrypted: ', data, data.length);
 			//self._socket.write(data, 'binary'); // encoding should be 'binary'
 			net.Socket.prototype.write.call(self._socket, data, 'binary'); // encoding should be 'binary'
 		},
@@ -98,15 +105,15 @@ TLSSocket.prototype._init = function(socket) {
 			var data = connection.data.getBytes(),
 				buffer = new Buffer(data, 'binary');
 
-			console.log('[tls] received: ', data);
+			self.log('[tls] received: ', data);
 			self.push(buffer);
 		},
 		closed: function() {
-			console.log('[tls] disconnected');
+			self.log('[tls] disconnected');
 			self.end();
 		},
 		error: function(connection, error) {
-			console.log('[tls] error', error);
+			self.log('[tls] error', error);
 			error.toString = function () {
 				return 'TLS error: '+error.message;
 			};
@@ -126,7 +133,7 @@ TLSSocket.prototype._init = function(socket) {
 		}
 	}
 
-	console.log('[tls] init');
+	this.log('[tls] init');
 
 	// Start handshaking if connected
 	if (this._socket.readyState != 'open') {
@@ -140,7 +147,7 @@ TLSSocket.prototype._init = function(socket) {
 };
 
 TLSSocket.prototype._start = function () {
-	console.log('[tls] handshaking');
+	this.log('[tls] handshaking');
 	this.ssl.handshake();
 };
 
@@ -149,7 +156,7 @@ TLSSocket.prototype._read = function () {};
 TLSSocket.prototype._writenow = function (data, encoding, cb) {
 	cb = cb || function () {};
 
-	console.log('[tls] sending: ', data.toString('utf8'));
+	this.log('[tls] sending: ', data.toString('utf8'));
 	var result = this.ssl.prepare(data.toString('binary'));
 
 	process.nextTick(function () {
