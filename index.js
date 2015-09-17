@@ -9,7 +9,7 @@ if (forge.forge) {
 	forge = forge.forge;
 }
 
-function TLSSocket(socket, options, debug) {
+function TLSSocket(socket, options) {
 	if (!(this instanceof TLSSocket)) return new TLSSocket(socket, options);
 
 	var self = this;
@@ -21,7 +21,6 @@ function TLSSocket(socket, options, debug) {
 
 	this._tlsOptions = options;
 	this._secureEstablished = false;
-        this.debug = debug || false;
 
 	// Just a documented property to make secure sockets
 	// distinguishable from regular ones.
@@ -49,7 +48,7 @@ util.inherits(TLSSocket, net.Socket);
 exports.TLSSocket = TLSSocket;
 
 TLSSocket.prototype.log = function(arguments) {
-    if (this.debug) {
+    if (this._tlsOptions.debug) {
         console.log.apply(console, Array.prototype.slice.call(arguments));
     }
 }
