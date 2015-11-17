@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "index.js",
   "dependencies": {
-    "node-forge": "^0.6.12"
+    "node-forge": "^0.6.38"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,6 @@
     "postinstall": "cd node_modules/node-forge && npm install --production=false && npm run minify"
   },
   "browser": {
-    "node-forge": "^0.6.38"
+    "node-forge": "node-forge/js/forge.min.js"
   }
 }
