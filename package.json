@@ -25,6 +25,6 @@
     "postinstall": "cd node_modules/node-forge && npm install --production=false && npm run minify"
   },
   "browser": {
-    "node-forge": "node-forge/js/forge.min.js"
+    "node-forge": "^0.6.38"
   }
 }
