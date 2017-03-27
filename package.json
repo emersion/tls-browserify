@@ -1,6 +1,6 @@
 {
   "name": "tls-browserify",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A port of the tls module for the browser.",
   "author": "Emersion <contact@emersion.fr>",
   "license": "MIT",
