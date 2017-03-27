@@ -21,6 +21,7 @@ function TLSSocket(socket, options) {
 
 	this._tlsOptions = options;
 	this._secureEstablished = false;
+	this._chunks = [];
 
 	// Just a documented property to make secure sockets
 	// distinguishable from regular ones.
@@ -48,9 +49,9 @@ util.inherits(TLSSocket, net.Socket);
 exports.TLSSocket = TLSSocket;
 
 TLSSocket.prototype.log = function(arguments) {
-    if (this._tlsOptions.debug) {
-        console.log.apply(console, Array.prototype.slice.call(arguments));
-    }
+	if (this._tlsOptions.debug) {
+		console.log.apply(console, Array.prototype.slice.call(arguments));
+	}
 }
 
 TLSSocket.prototype._init = function(socket) {
@@ -90,6 +91,7 @@ TLSSocket.prototype._init = function(socket) {
 			//client.prepare('GET / HTTP/1.0\r\n\r\n');
 
 			self._secureEstablished = true;
+			self._writePending();
 			self.emit('secure');
 		},
 		tlsDataReady: function(connection) {
@@ -164,15 +166,22 @@ TLSSocket.prototype._writenow = function (data, encoding, cb) {
 	});
 };
 
+TLSSocket.prototype._writePending = function() {
+	if (this._chunks.length > 0) {
+		for (var i in this._chunks) {
+			this._writenow(this._chunks[i][0], this._chunks[i][1], this._chunks[i][2]);
+		}
+		this._chunks = [];
+	}
+};
+
 TLSSocket.prototype._write = function (data, encoding, cb) {
-    var self = this;
-    if (!self._secureEstablished) {
-        this.once('secure', function () {
-            self._writenow(data, encoding, cb);
-        });
-    } else {
-        this._writenow(data, encoding, cb);
-    }
+	if (!this._secureEstablished) {
+		this._chunks.push([data, encoding, cb]);
+	} else {
+		this._writePending();
+		this._writenow(data, encoding, cb);
+	}
 };
 
 TLSSocket.prototype.connect = function () {
